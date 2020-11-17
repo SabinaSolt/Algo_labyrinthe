@@ -1,9 +1,14 @@
 $(document).ready(function () {
     $("#build_labyr").click(function () {
-        build_labyrinthe()
+        build_labyrinthe();
+        $("#resoudre_dfs").removeAttr('disabled');
     });
     $("#resoudre_dfs").click(function () {
+        $(this).attr("disabled","disabled");
         resoudre_dfs();
+    });
+    $("#stop_execution").click(function () {
+
     });
 
 })
@@ -11,13 +16,16 @@ $(document).ready(function () {
 let myLabyrinthe = [];
 let size;
 
+
+
+
 function build_labyrinthe() {
     size = $('#size').val();
     let case_size_px = $("#case_size_px").val();
     let variante = Math.floor(Math.random() * 3);
     let labyrinthe = labyrAll[size]["ex-" + variante];
     myLabyrinthe = set_my_labyrinthe(labyrinthe);
-    //console.log(myLabyrinthe);
+    console.log(size,"ex-" + variante);
     draw_labyrinthe(size, labyrinthe, case_size_px);
 }
 
@@ -80,24 +88,24 @@ function resoudre_dfs() {
         let next_id;
         let last_id = -1;
         do {
-
             let x = myLabyrinthe[id].posX;
             let y = myLabyrinthe[id].posY;
             console.log("x:"+x+"; y:"+y);
+
             myLabyrinthe[id].active = true;
             myLabyrinthe[id].visited = true;
             change_cell_color(id);
+            //setTimeout(function(){change_cell_color(id)},chemin.length*5000);
 
             if (last_id >= 0) {
                 change_cell_color(last_id);
+                //setTimeout(function(){change_cell_color(last_id)},chemin.length*5000);
             }
-
             if (myLabyrinthe[id].arrival) {
                 isFinished = true;
                 console.log("finished true")
             } else {
                 let down_id, droit_id, haut_id, gauche_id = -1;
-
                 if (myLabyrinthe[id].mur_bas === false) {
                     console.log("mur_bas === false")
                     down_id = get_case_id(x+1, y )
@@ -114,7 +122,6 @@ function resoudre_dfs() {
                     console.log("mur_gauche === false")
                     gauche_id = get_case_id(x, y-1);
                 }
-
                 if (down_id > -1 && myLabyrinthe[down_id].visited === false) {
                     next_id = down_id;
                 } else if (droit_id > -1 && myLabyrinthe[droit_id].visited === false) {
@@ -125,32 +132,35 @@ function resoudre_dfs() {
                     next_id = gauche_id;
                 } else {
                     myLabyrinthe[id].dead_end = true;
-                    next_id = chemin[chemin.length - 1]
+                    console.log("dead_end");
+                    change_cell_color(id);
+                   // setTimeout(function(){change_cell_color(id)},chemin.length*5000);
+                    next_id = chemin[chemin.length - 1];
+                    chemin.pop();
                 }
                 if (myLabyrinthe[id].dead_end === false) {
                     chemin.push(id);
                 }
-
                 myLabyrinthe[id].active = false;
                 last_id = id;
                 id = next_id;
+
+
             }
         } while (isFinished === false);
+        console.log("nombre de pas pour résoudre: "+chemin.length);
+        //setTimeout(function (){color_escape_path(chemin)},(chemin.length+3)*5000);
         color_escape_path(chemin);
-
-
     } else {
         alert("Build the labyrinth first");
     }
 }
-
 
 function get_case_id(x, y) {
     let id = -1;
     let i = 0;
     do {
         let my_case = myLabyrinthe[i];
-
         if (my_case.posX === x && my_case.posY === y) {
             id = i;
         }
@@ -160,26 +170,22 @@ function get_case_id(x, y) {
 }
 
 function color_escape_path(chemin) {
-    chemin.forEach(function (id) {
-        if(id>0&&id!==chemin.length-1) {
-            let cell = "#cell" + myLabyrinthe[id].posX + "_" + myLabyrinthe[id].posY;
-
-            $(cell).css("background-color", "#5bc0de");
-            console.log(cell+": "+$(cell).css("background-color"));
-        }
-    })
+    for(let i=1;i<chemin.length;i++) {
+        let id=chemin[i];
+        let cell = "#cell" + myLabyrinthe[id].posX + "_" + myLabyrinthe[id].posY;
+        $(cell).css("background-color", "#5bc0de");
+    }
 }
 
 function change_cell_color(id) {
-    let cell = "#cell" + myLabyrinthe[id].posX + "_" + myLabyrinthe[id].posY;
-    if(id!==0 && !myLabyrinthe[id].arrival) {
-        if (myLabyrinthe[id].active) {
-            $(cell).css("background-color", "blue");
-        } else if (myLabyrinthe[id].dead_end) {
-            $(cell).css("background-color", "#8c8c8c");
-        } else if (myLabyrinthe[id].visited) {
-            $(cell).css("background-color", "mediumpurple");
+        let cell = "#cell" + myLabyrinthe[id].posX + "_" + myLabyrinthe[id].posY;
+        if(id!==0 && !myLabyrinthe[id].arrival) {
+            if (myLabyrinthe[id].active) {
+                $(cell).css("background-color", "blue");
+            } else if (myLabyrinthe[id].dead_end) {
+                $(cell).css("background-color", "grey");
+            } else if (myLabyrinthe[id].visited) {
+                $(cell).css("background-color", "mediumpurple");
+            }
         }
-    }
-
 }
