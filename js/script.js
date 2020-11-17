@@ -4,8 +4,12 @@ $(document).ready(function () {
         $("#resoudre_dfs").removeAttr('disabled');
     });
     $("#resoudre_dfs").click(function () {
-        $(this).attr("disabled","disabled");
-        resoudre_dfs();
+        if ($("#cell0_0").length) {
+            $(this).attr("disabled", "disabled");
+            resoudre_dfs();
+        } else {
+            alert("Build the labyrinth first");
+        }
     });
     $("#stop_execution").click(function () {
 
@@ -17,15 +21,13 @@ let myLabyrinthe = [];
 let size;
 
 
-
-
 function build_labyrinthe() {
     size = $('#size').val();
     let case_size_px = $("#case_size_px").val();
     let variante = Math.floor(Math.random() * 3);
     let labyrinthe = labyrAll[size]["ex-" + variante];
     myLabyrinthe = set_my_labyrinthe(labyrinthe);
-    console.log(size,"ex-" + variante);
+    console.log(size, "ex-" + variante);
     draw_labyrinthe(size, labyrinthe, case_size_px);
 }
 
@@ -56,7 +58,7 @@ function draw_labyrinthe(size, labyrinthe, case_size_px) {
     for (let x = 0; x < size; x++) {
         $("#grille tbody").append('<tr id="row' + x + '"></tr>');
         for (let y = 0; y < size; y++) {
-            $("#row" + x).append('<td id="cell' + x + "_" + y + '">x:'+x+', y:'+y+ '</td>');
+            $("#row" + x).append('<td id="cell' + x + "_" + y + '">x:' + x + ', y:' + y + '</td>');
             $("#cell" + x + "_" + y).addClass("")
             //changer la couleur des bordures:
             if (labyrinthe[cell_number].walls[0]) {
@@ -80,8 +82,141 @@ function draw_labyrinthe(size, labyrinthe, case_size_px) {
 }
 
 function resoudre_dfs() {
-    if ($("#cell0_0").length) {
+    //let S be a stack
+    let stack = [];
+    let chemin = [];
+    let id = 0;
+    let isFinished = false;
+    let last_id = -1;
+    let counter = 0;
+    do {
+        myLabyrinthe[id].active = true;
+        myLabyrinthe[id].visited = true;
+        stack.push(id);
+        chemin.push(id);
+        change_cell_color(id);
+        if (last_id >= 0) {
+            change_cell_color(last_id);
+        }
 
+        let neighbours = get_neighbours(id);
+        isFinished = check_arrival(neighbours);
+
+        if (isFinished) {
+            console.log("finished true");
+
+        } else {
+            let dead_end = false;
+            let next_neighbours = get_not_visited(neighbours);
+            if (next_neighbours.length > 0) {
+                next_neighbours.forEach(function (id) {
+                    stack.push(id);
+                })
+            } else {
+                dead_end = true;
+                myLabyrinthe[id].dead_end = true;
+                console.log("dead_end");
+                change_cell_color(id);
+                stack.pop();
+                chemin.pop();
+            }
+            myLabyrinthe[id].active = false;
+            last_id = id;
+            id = stack.pop();
+        }
+
+        counter += 1;
+    } while (isFinished === false);
+
+    console.log("nombre de pas pour résoudre: " + counter);
+    color_escape_path(chemin);
+}
+
+function get_case_id(x, y) {
+    let id = -1;
+    let i = 0;
+    do {
+        let my_case = myLabyrinthe[i];
+        if (my_case.posX === x && my_case.posY === y) {
+            id = i;
+        }
+        i += 1;
+    } while (id < 0)
+    return id;
+}
+
+
+function get_neighbours(id) {
+    let x = myLabyrinthe[id].posX;
+    let y = myLabyrinthe[id].posY;
+    console.log("x:" + x + "; y:" + y);
+    let neighbours = [];
+    if (myLabyrinthe[id].mur_gauche === false) {
+        console.log("mur_gauche === false")
+        let gauche_id = get_case_id(x, y - 1);
+        neighbours.push(gauche_id);
+    }
+    if (myLabyrinthe[id].mur_haut === false) {
+        console.log("mur_haut === false")
+        let haut_id = get_case_id(x - 1, y);
+        neighbours.push(haut_id);
+    }
+    if (myLabyrinthe[id].mur_droit === false) {
+        console.log("mur_droit === false")
+        let droit_id = get_case_id(x, y + 1);
+        neighbours.push(droit_id);
+    }
+    if (myLabyrinthe[id].mur_bas === false) {
+        console.log("mur_bas === false")
+        let down_id = get_case_id(x + 1, y);
+        neighbours.push(down_id);
+    }
+    return neighbours;
+}
+
+function check_arrival(neighbours) {
+    let isFinished = false;
+    neighbours.forEach(function (id) {
+        if (myLabyrinthe[id].arrival) {
+            isFinished = true;
+        }
+    });
+    return isFinished;
+}
+
+function get_not_visited(neighbours) {
+    let not_visited_neighbours = [];
+    neighbours.forEach(function (id) {
+        if (!myLabyrinthe[id].visited) {
+            not_visited_neighbours.push(id);
+        }
+    })
+    return not_visited_neighbours;
+}
+
+function color_escape_path(chemin) {
+    for (let i = 1; i < chemin.length; i++) {
+        let id = chemin[i];
+        let cell = "#cell" + myLabyrinthe[id].posX + "_" + myLabyrinthe[id].posY;
+        $(cell).css("background-color", "#5bc0de");
+    }
+}
+
+function change_cell_color(id) {
+    let cell = "#cell" + myLabyrinthe[id].posX + "_" + myLabyrinthe[id].posY;
+    if (id !== 0 && !myLabyrinthe[id].arrival) {
+        if (myLabyrinthe[id].active) {
+            $(cell).css("background-color", "blue");
+        } else if (myLabyrinthe[id].dead_end) {
+            $(cell).css("background-color", "grey");
+        } else if (myLabyrinthe[id].visited) {
+            $(cell).css("background-color", "mediumpurple");
+        }
+    }
+}
+
+
+/*function resoudre_dfs_old() {
         let chemin = [];
         let id = 0;
         let isFinished = false;
@@ -90,7 +225,7 @@ function resoudre_dfs() {
         do {
             let x = myLabyrinthe[id].posX;
             let y = myLabyrinthe[id].posY;
-            console.log("x:"+x+"; y:"+y);
+            console.log("x:" + x + "; y:" + y);
 
             myLabyrinthe[id].active = true;
             myLabyrinthe[id].visited = true;
@@ -108,19 +243,19 @@ function resoudre_dfs() {
                 let down_id, droit_id, haut_id, gauche_id = -1;
                 if (myLabyrinthe[id].mur_bas === false) {
                     console.log("mur_bas === false")
-                    down_id = get_case_id(x+1, y )
+                    down_id = get_case_id(x + 1, y);
                 }
                 if (myLabyrinthe[id].mur_droit === false) {
                     console.log("mur_droit === false")
-                    droit_id = get_case_id(x , y+1);
+                    droit_id = get_case_id(x, y + 1);
                 }
                 if (myLabyrinthe[id].mur_haut === false) {
                     console.log("mur_haut === false")
-                   haut_id = get_case_id(x-1, y );
+                    haut_id = get_case_id(x - 1, y);
                 }
                 if (myLabyrinthe[id].mur_gauche === false) {
                     console.log("mur_gauche === false")
-                    gauche_id = get_case_id(x, y-1);
+                    gauche_id = get_case_id(x, y - 1);
                 }
                 if (down_id > -1 && myLabyrinthe[down_id].visited === false) {
                     next_id = down_id;
@@ -134,7 +269,7 @@ function resoudre_dfs() {
                     myLabyrinthe[id].dead_end = true;
                     console.log("dead_end");
                     change_cell_color(id);
-                   // setTimeout(function(){change_cell_color(id)},chemin.length*5000);
+                    // setTimeout(function(){change_cell_color(id)},chemin.length*5000);
                     next_id = chemin[chemin.length - 1];
                     chemin.pop();
                 }
@@ -144,48 +279,9 @@ function resoudre_dfs() {
                 myLabyrinthe[id].active = false;
                 last_id = id;
                 id = next_id;
-
-
             }
         } while (isFinished === false);
-        console.log("nombre de pas pour résoudre: "+chemin.length);
+        console.log("nombre de pas pour résoudre: " + chemin.length);
         //setTimeout(function (){color_escape_path(chemin)},(chemin.length+3)*5000);
         color_escape_path(chemin);
-    } else {
-        alert("Build the labyrinth first");
-    }
-}
-
-function get_case_id(x, y) {
-    let id = -1;
-    let i = 0;
-    do {
-        let my_case = myLabyrinthe[i];
-        if (my_case.posX === x && my_case.posY === y) {
-            id = i;
-        }
-        i += 1;
-    } while (id < 0)
-    return id;
-}
-
-function color_escape_path(chemin) {
-    for(let i=1;i<chemin.length;i++) {
-        let id=chemin[i];
-        let cell = "#cell" + myLabyrinthe[id].posX + "_" + myLabyrinthe[id].posY;
-        $(cell).css("background-color", "#5bc0de");
-    }
-}
-
-function change_cell_color(id) {
-        let cell = "#cell" + myLabyrinthe[id].posX + "_" + myLabyrinthe[id].posY;
-        if(id!==0 && !myLabyrinthe[id].arrival) {
-            if (myLabyrinthe[id].active) {
-                $(cell).css("background-color", "blue");
-            } else if (myLabyrinthe[id].dead_end) {
-                $(cell).css("background-color", "grey");
-            } else if (myLabyrinthe[id].visited) {
-                $(cell).css("background-color", "mediumpurple");
-            }
-        }
-}
+}*/
