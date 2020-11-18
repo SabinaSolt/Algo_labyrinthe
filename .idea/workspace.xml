@@ -19,8 +19,9 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cec2f3a2-03f2-4055-841a-5f6bc544edb8" name="Default Changelist" comment="DFS works fine">
+    <list default="true" id="cec2f3a2-03f2-4055-841a-5f6bc544edb8" name="Default Changelist" comment="DFS really DFS">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/js/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/js/script.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -90,7 +91,8 @@
       <workItem from="1605255076678" duration="691000" />
       <workItem from="1605255801844" duration="19960000" />
       <workItem from="1605514673199" duration="23064000" />
-      <workItem from="1605600062744" duration="20243000" />
+      <workItem from="1605600062744" duration="22101000" />
+      <workItem from="1605687287167" duration="18765000" />
     </task>
     <task id="LOCAL-00001" summary="grille ok">
       <created>1605282671691</created>
@@ -113,7 +115,14 @@
       <option name="project" value="LOCAL" />
       <updated>1605615635276</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="DFS really DFS">
+      <created>1605628406090</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1605628406090</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -135,7 +144,8 @@
     <MESSAGE value="grille ok" />
     <MESSAGE value="DFS in progress" />
     <MESSAGE value="DFS works fine" />
-    <option name="LAST_COMMIT_MESSAGE" value="DFS works fine" />
+    <MESSAGE value="DFS really DFS" />
+    <option name="LAST_COMMIT_MESSAGE" value="DFS really DFS" />
   </component>
   <component name="WindowStateProjectService">
     <state x="395" y="90" key="#Inspections" timestamp="1605279820795">
@@ -150,18 +160,18 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="499" y="159" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.824@0.0.1536.824" timestamp="1605257530893" />
-    <state x="549" y="167" key="FileChooserDialogImpl" timestamp="1605530980784">
+    <state x="549" y="167" key="FileChooserDialogImpl" timestamp="1605709839518">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="549" y="167" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1605530980784" />
+    <state x="549" y="167" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1605709839518" />
     <state x="277" y="57" key="SettingsEditor" timestamp="1605261352107">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="277" y="57" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1605261352107" />
-    <state x="361" y="141" key="Vcs.Push.Dialog.v2" timestamp="1605615641350">
+    <state x="361" y="141" key="Vcs.Push.Dialog.v2" timestamp="1605628413526">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="361" y="141" key="Vcs.Push.Dialog.v2/0.0.1536.824@0.0.1536.824" timestamp="1605615641350" />
+    <state x="361" y="141" key="Vcs.Push.Dialog.v2/0.0.1536.824@0.0.1536.824" timestamp="1605628413526" />
     <state x="425" y="187" key="run.anything.popup" timestamp="1605540991630">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
