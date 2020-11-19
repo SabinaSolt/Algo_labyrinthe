@@ -18,7 +18,7 @@ $(document).ready(function () {
         if ($("#cell0_0").length) {
             $("#resoudre_dfs").attr("disabled", "disabled");
             $("#resoudre_bfs").attr("disabled", "disabled");
-            resoudre_bfs();
+            resoudre_bfs_v2();
         } else {
             alert("Build the labyrinth first");
         }
@@ -36,10 +36,11 @@ let size;
 function build_labyrinthe() {
     size = $('#size').val();
     let case_size_px = $("#case_size_px").val();
-    let variante = Math.floor(Math.random() * 3);
-    let labyrinthe = labyrAll[size]["ex-" + variante];
+    //let variante = Math.floor(Math.random() * 3);
+    let variante=$("#variante").val();
+    let labyrinthe = labyrAll[size][variante];
     myLabyrinthe = set_my_labyrinthe(labyrinthe);
-    console.log(size, "ex-" + variante);
+    //console.log(size, "ex-" + variante);
     draw_labyrinthe(size, labyrinthe, case_size_px);
 }
 
@@ -101,8 +102,8 @@ function resoudre_dfs() {
     let id = 0;
     let isFinished = false;
     let last_id = -1;
-
     let counter = 0;
+
     do {
         myLabyrinthe[id].active = true;
         myLabyrinthe[id].visited = true;
@@ -110,11 +111,7 @@ function resoudre_dfs() {
         change_cell_color(id);
         if (last_id >= 0) {
             change_cell_color(last_id);
-
         }
-
-        let neighbours = get_neighbours(id);
-        //let finish_id = check_arrival(neighbours);
 
         if (myLabyrinthe[id].arrival) {
             isFinished = true;
@@ -123,7 +120,7 @@ function resoudre_dfs() {
             chemin = get_chemin(id);
             console.log("chemin:" + chemin);
         } else {
-            let dead_end = false;
+            let neighbours = get_neighbours(id);
             let next_neighbours = get_not_visited(neighbours);
             if (next_neighbours.length > 0) {
                 myLabyrinthe[id].parent = last_id;
@@ -132,10 +129,8 @@ function resoudre_dfs() {
                     stack.push(id);
                 })
             } else {
-                dead_end = true;
                 myLabyrinthe[id].dead_end = true;
                 console.log("dead_end");
-
                 stack.pop();
             }
             myLabyrinthe[id].active = false;
@@ -149,20 +144,53 @@ function resoudre_dfs() {
     color_escape_path(chemin);
 }
 
-function get_chemin(finish_id) {
-    let id = finish_id;
-    let chemin = [];
-    do {
-        if(!myLabyrinthe[id].dead_end) {
-            chemin.push(id);
-        }
-        id = myLabyrinthe[id].parent;
 
-    } while (id > 0);
-    return chemin;
+
+function resoudre_bfs_v2() {
+    let queue = [];
+    let chemin=[];
+    let id = 0;
+    let isFinished = false;
+    let counter = 0;
+
+    do {
+        myLabyrinthe[id].active = true;
+        myLabyrinthe[id].visited = true;
+
+        if (id > 0) {
+            change_cell_color(myLabyrinthe[id].parent);
+        }
+        change_cell_color(id);
+
+        if (myLabyrinthe[id].arrival) {
+            isFinished = true;
+            console.log("finished true");
+            chemin = get_chemin(id);
+            console.log("chemin:" + chemin);
+        } else {
+            let neighbours = get_neighbours(id);
+            let next_neighbours = get_not_visited(neighbours);
+            if (next_neighbours.length > 0) {
+                next_neighbours.forEach(function (next_id) {
+                    queue.unshift(next_id);
+                    myLabyrinthe[next_id].parent = id;
+                })
+            } else {
+                myLabyrinthe[id].dead_end = true;
+            }
+            myLabyrinthe[id].active = false;
+            change_cell_color(id);
+            id = queue.pop();
+        }
+        counter += 1;
+    } while (isFinished === false);
+
+    console.log("nombre de pas pour résoudre: " + counter);
+    color_escape_path(chemin);
 }
 
-function resoudre_bfs() {
+
+function resoudre_bfs_v1() {
     let id = 0;
     let counter = 0;
     /*Debut de la fonction recursive*/
@@ -175,6 +203,7 @@ function resoudre_bfs() {
 }
 
 function bfs_iterative(id, last_id = -1) {
+    let stack=[];
     myLabyrinthe[id].active = true;
     myLabyrinthe[id].visited = true;
     change_cell_color(id);
@@ -197,12 +226,12 @@ function bfs_iterative(id, last_id = -1) {
             myLabyrinthe[id].dead_end = true;
             console.log("dead_end");
             change_cell_color(id);
-            let dead_end = bfs_iterative(last_id, myLabyrinthe[last_id].parent)
+            let dead_end = bfs_iterative(last_id)
             return dead_end;
         }
     } else {
         // console.log("finished true");
-        change_cell_color(id);
+        //change_cell_color(id);
 
         return "ceoooo";
     }
@@ -221,6 +250,17 @@ function get_case_id(x, y) {
     return id;
 }
 
+function get_chemin(finish_id) {
+    let id = finish_id;
+    let chemin = [];
+    do {
+        if(!myLabyrinthe[id].dead_end) {
+            chemin.push(id);
+        }
+        id = myLabyrinthe[id].parent;
+    } while (id > 0);
+    return chemin;
+}
 
 function get_neighbours(id) {
     let x = myLabyrinthe[id].posX;
@@ -248,18 +288,6 @@ function get_neighbours(id) {
         neighbours.push(down_id);
     }
     return neighbours;
-}
-
-function check_arrival(neighbours) {
-    //let isFinished = false;
-    let finish_id;
-    neighbours.forEach(function (id) {
-        if (myLabyrinthe[id].arrival) {
-            //isFinished = true;
-            finish_id = id;
-        }
-    });
-    return finish_id;
 }
 
 function get_not_visited(neighbours) {

@@ -18,22 +18,30 @@
         <div class='col-xs-4'>
             <div class='form-group'>
                 <label for='size'>Taille du labyrinthe</label>
-                <input id='size' class='form-control' type='number' value="3" min="3" max="25" step="1"/>
+                <input id='size' class='form-control' type='number' value="10" min="3" max="25" step="1"/>
                 <br><span>La taille du labyrinthe varie de 3x3 à 25x25 cases</span>
             </div>
-
+            <div class='form-group'>
+                <label for='variante'>Variante du labyrinthe</label>
+                <select class='form-control' id='variante'>
+                    <option value='ex-0' selected>ex-0</option>
+                    <option value='ex-1'>ex-1</option>
+                    <option value='ex-2' >ex-2</option>
+                </select>
+            </div>
             <div class='form-group'>
                 <label for='case_size_px'>Taille de la case</label>
                 <select class='form-control' id='case_size_px'>
                     <option value='10px'>10px</option>
                     <option value='15px'>15px</option>
                     <option value='20px' >20px</option>
-                    <option value='30px'>30px</option>
+                    <option value='30px' >30px</option>
                     <option value='40px'>40px</option>
                     <option value='50px' selected>50px</option>
 
                 </select>
             </div>
+
             <div class='form-group'>
             <button type="button" class="btn btn-success" id="build_labyr">Créer le labyrinthe</button>
             <button type="button" class="btn btn-success" id="resoudre_dfs">Résoudre DFS</button>
